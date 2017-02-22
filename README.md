@@ -21,8 +21,19 @@ List<Object> objects = holocron.getAll(object.getClass());
 boolean deleted = holocron.remove(object.getClass(),(long)id);
 
 //delete all objects of a provided Class from storage
-boolean deleted = holocron.remove(object.getClass(),(long)id);
+boolean deleted = holocron.remove(object.getClass());
 
+```
+
+## Example
+The accompanying example shows the adding, displaying and removing of Checkpoint class objects.
+
+```java
+public class Checkpoint{
+    private long id;
+    private String name;
+    private double longitude,latitude;
+}
 ```
 
 ## Encryption:
