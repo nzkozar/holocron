@@ -1,12 +1,10 @@
 package com.ak93.encryptedjsondatastorageexample;
 
-import java.io.Serializable;
-
 /**
  * Created by Anže Kožar on 11.2.2017.
  */
 
-public class Checkpoint implements Serializable{
+public class Checkpoint{
 
     private long id;
 

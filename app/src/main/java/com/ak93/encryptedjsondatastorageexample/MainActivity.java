@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
 
-        holocron = Holocron.initialize(this);
+        holocron = Holocron.init(this);
 
         init();
     }

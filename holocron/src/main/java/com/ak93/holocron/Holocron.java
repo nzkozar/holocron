@@ -38,7 +38,7 @@ public class Holocron {
     private final String TAG = "Holocron";
 
 
-    public static Holocron initialize(Context context){
+    public static Holocron init(Context context){
         return new Holocron(context);
     }
 
