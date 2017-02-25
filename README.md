@@ -2,8 +2,25 @@
 <h4>Encrypted Object Storage for Android</h4>
 <blockquote>Holocrons are ancient repositories of knowledge and wisdom that can only be accessed by those skilled in the Force.</blockquote>
 
-## Usage:
+## Add through JitPack
+<b>Step 1.:</b> Add JitPack in your root build.gradle at the end of repositories:
+```gradle
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+<b>Step 2. Add the dependency
+```gradle
+	dependencies {
+	        compile 'com.github.nzkozar:holocron:v1.0'
+	}
+```
 
+## Usage:
+### Constructors
 ```java
 //Init Holocron. This will take  few seconds to execute, as it must build encryption resources.
 Holocron holocron = new Holocron(context);
@@ -15,7 +32,9 @@ Holocron holocron = new Holocron(context, new Holocron.HolocronResponseHandler()
                     //Holocron can now be used
                 }
             });
-
+```
+### Save & retrieve objects from storage
+```java
 //save an object of any Class that extends Object
 holocron.put(object, (long)object.getId());
 
@@ -32,7 +51,9 @@ holocron.getAllAsync(object.class, new Holocron.HolocronResponseHandler() {
                 List<Object> objects = data.getDataObjectList());
             }
         });
-                
+```
+### Delete objects from storage
+```java
 //delete an object from storage
 boolean deleted = holocron.remove(object.getClass(),(long)id);
 
@@ -63,8 +84,4 @@ public class Checkpoint{
 All data is encrypted using AES encryption.
 
 ### Gson
-This library uses Gson to convert objects. Gson library is included in this library package, so there is no need to import it separately.
-
-
-## In development
-This library is still in development. Once it is ready to use Out-Of-The-Box, import options will be listed here.
+This library uses Gson to convert objects, so any object convertable by Gson can be stored with Holocron.
