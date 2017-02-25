@@ -5,8 +5,16 @@
 ## Usage:
 
 ```java
-//init Holocron. This will take  few seconds to execute, as it must build encryption resources.
-Holocron holocron = Holocron.init(context);
+//Init Holocron. This will take  few seconds to execute, as it must build encryption resources.
+Holocron holocron = new Holocron(context);
+
+//Init Holocron asynchronously and get notified through a HolocronResponseHandler interface when Holocron is ready.
+Holocron holocron = new Holocron(context, new Holocron.HolocronResponseHandler() {
+                @Override
+                public void onHolocronResponse(int responseCode, HolocronResponse response) {
+                    //Holocron can now be used
+                }
+            });
 
 //save an object of any Class that extends Object
 holocron.put(object, (long)object.getId());
@@ -17,12 +25,27 @@ Object object = holocron.get(object.getClass(),(long)id);
 //retrieve all objects stored using the provided Class
 List<Object> objects = holocron.getAll(object.getClass());
 
+//retrieve asynchronously all objects stored using the provided Class
+holocron.getAllAsync(object.class, new Holocron.HolocronResponseHandler() {
+            @Override
+            public void onHolocronResponse(int responseCode, HolocronResponse response) {
+                List<Object> objects = data.getDataObjectList());
+            }
+        });
+                
 //delete an object from storage
 boolean deleted = holocron.remove(object.getClass(),(long)id);
 
 //delete all objects of a provided Class from storage
 boolean deleted = holocron.remove(object.getClass());
 
+//delete asynchronously all objects of a provided Class from storage
+holocron.removeAllAsync(object.class, new Holocron.HolocronResponseHandler() {
+        @Override
+        public void onHolocronResponse(int responseCode, HolocronResponse response) {
+            //Objects deleted
+        }
+    });
 ```
 
 ## Example
@@ -37,11 +60,9 @@ public class Checkpoint{
 ```
 
 ## Encryption:
-
 All data is encrypted using AES encryption.
 
 ### Gson
-
 This library uses Gson to convert objects. Gson library is included in this library package, so there is no need to import it separately.
 
 
