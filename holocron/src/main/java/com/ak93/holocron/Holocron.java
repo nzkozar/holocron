@@ -28,27 +28,54 @@ import java.util.List;
 
 public class Holocron {
 
+    private static final int HOLOCRON_RESPONSE_INITIALIZED = 500;
+    private static final int HOLOCRON_RESPONSE_OBJECTS_RETRIEVED = 501;
+    private static final int HOLOCRON_RESPONSE_OBJECTS_REMOVED = 502;
+
     private Context mContext;
+    private HolocronResponseHandler mCallback;
     private Configuration mConfiguration;
     private Gson mGson;
+    private boolean initialized = false;
 
     //Encryption fields
     private Force mForce;
 
     private final String TAG = "Holocron";
 
-
-    public static Holocron init(Context context){
-        return new Holocron(context);
-    }
-
-    private Holocron(Context context){
+    /**
+     * Standard constructor.
+     * NOTE: Executes on main thread and will block for 2-3 seconds.
+     * If this is not acceptable for your application, use the asynchronous constructor.
+     * @param context Activity or application Context
+     */
+    public Holocron(Context context){
         mContext = context;
         mGson = new Gson();
 
         mForce = new Force(mContext);
-
         readConfiguration();
+    }
+
+    /**
+     * Asynchronous constructor. Use this constructor to avoid having your main thread execution delayed.
+     * @param context Activity or application Context
+     * @param callback A response callback handler, that will receive a callback when Holocron
+     *                 has been initialized.
+     */
+    public Holocron(final Context context, HolocronResponseHandler callback){
+        mContext = context;
+        mCallback = callback;
+        mGson = new Gson();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mForce = new Force(context);
+                readConfiguration();
+                mCallback.onHolocronResponse(HOLOCRON_RESPONSE_INITIALIZED,null);
+            }
+        }).start();
     }
 
     /**
@@ -112,6 +139,23 @@ public class Holocron {
             }
         }
         return objects;
+    }
+
+    /**
+     * Retrieves all Objects of a particular class and returns them using the provided callback.
+     * All object reading work is done on a background thread.
+     * @param c The class of the objects to retrieve
+     * @param callback A callback through which the data is returned.
+     */
+    public void getAllAsync(final Class c, final HolocronResponseHandler callback){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<Object> objectList = getAll(c);
+                callback.onHolocronResponse(HOLOCRON_RESPONSE_OBJECTS_RETRIEVED,
+                        new HolocronData(null,objectList,null));
+            }
+        }).start();
     }
 
     /**
@@ -184,6 +228,19 @@ public class Holocron {
         return true;
     }
 
+    public void removeAllAsync(final Class c, final HolocronResponseHandler callback){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                removeAll(c);
+                if(callback!=null){
+                    callback.onHolocronResponse(HOLOCRON_RESPONSE_OBJECTS_REMOVED
+                            ,new HolocronData(null,null,c));
+                }
+            }
+        }).start();
+    }
+
     @Nullable
     private String getObjectFileName(Class c, long id){
         String classHash = mConfiguration.getClassHash(c);
@@ -211,6 +268,7 @@ public class Holocron {
             mConfiguration = new Configuration();
             writeConfiguration();
         }
+        initialized = true;
     }
 
     private boolean writeConfiguration(){
@@ -282,5 +340,13 @@ public class Holocron {
      */
     public Force getForce() {
         return mForce;
+    }
+
+    public boolean isInitialized(){
+        return initialized;
+    }
+
+    public interface HolocronResponseHandler{
+        void onHolocronResponse(int responseCode, HolocronData data);
     }
 }

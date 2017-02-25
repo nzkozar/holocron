@@ -10,8 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.ak93.holocron.Holocron;
+import com.ak93.holocron.HolocronData;
 
 import java.util.ArrayList;
 
@@ -19,8 +21,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Holocron holocron;
 
+    private ProgressBar progressBar;
+
     private CheckpointListAdapter listAdapter;
     private ArrayList<Object> checkpoints = new ArrayList<>();
+
+    private boolean loadAsync = true;
 
     private static String TAG = "MainActivity";
 
@@ -29,13 +35,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
 
-        holocron = Holocron.init(this);
+        if(loadAsync){
+            progressBar.setIndeterminate(true);
+            progressBar.setVisibility(View.VISIBLE);
+            holocron = new Holocron(this, new Holocron.HolocronResponseHandler() {
+                @Override
+                public void onHolocronResponse(int responseCode, HolocronData data) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateCheckpointsList();
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                }
+            });
+        }else {
+            holocron = new Holocron(this);
+        }
 
         init();
     }
 
     private void init(){
+
         Button addButton = (Button)findViewById(R.id.add_button);
         addButton.setOnClickListener(this);
 
@@ -48,17 +73,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
 
-        checkpoints = (ArrayList<Object>) holocron.getAll(Checkpoint.class);
+        checkpoints = new ArrayList<>();
         listAdapter = new CheckpointListAdapter(checkpoints,"CheckpointListAdapter");
         listAdapter.setOnItemChildClickListener(this);
         recyclerView.setAdapter(listAdapter);
+
+        if(!loadAsync) updateCheckpointsList();
     }
 
     private void updateCheckpointsList(){
-        checkpoints.clear();
-        checkpoints.addAll(holocron.getAll(Checkpoint.class));
-        Log.i(TAG,"Objects retrieved: "+checkpoints.size());
-        listAdapter.notifyDataSetChanged();
+        if(holocron.isInitialized()) {
+            checkpoints.clear();
+            if(loadAsync){
+                holocron.getAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
+                    @Override
+                    public void onHolocronResponse(int responseCode, HolocronData data) {
+                        checkpoints.addAll(data.getDataObjectList());
+                        Log.i(TAG, "Objects retrieved: " + checkpoints.size());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                listAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                });
+            }else {
+                checkpoints.addAll(holocron.getAll(Checkpoint.class));
+                Log.i(TAG, "Objects retrieved: " + checkpoints.size());
+                listAdapter.notifyDataSetChanged();
+            }
+        }
     }
 
     @Override
@@ -77,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         holocron.getConfiguration().getNextClassId(Checkpoint.class)
                         ,name,longitude,latitude);
 
-                holocron.put(checkpoint, checkpoint.getId());
+                if(holocron.isInitialized())holocron.put(checkpoint, checkpoint.getId());
 
                 field_name.setText("");
                 field_longitude.setText("");
@@ -86,19 +131,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 updateCheckpointsList();
                 break;
             case R.id.remove_all_button:
-                new AlertDialog.Builder(this)
-                        .setTitle("Delete confirmation!")
-                        .setMessage("Do you really want to delete all stored instances of class Checkpoint?")
-                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                holocron.removeAll(Checkpoint.class);
-                                updateCheckpointsList();
-                                dialog.dismiss();
-                            }
-                        })
-                        .setNegativeButton("Cancel",null)
-                        .show();
+                if(holocron.isInitialized()) {
+                    new AlertDialog.Builder(this)
+                            .setTitle("Delete confirmation!")
+                            .setMessage("Do you really want to delete all stored instances of class Checkpoint?")
+                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(final DialogInterface dialog, int which) {
+                                    if(loadAsync){
+                                        holocron.removeAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
+                                            @Override
+                                            public void onHolocronResponse(int responseCode, HolocronData data) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        updateCheckpointsList();
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }else{
+                                        holocron.removeAll(Checkpoint.class);
+                                        updateCheckpointsList();
+                                        dialog.dismiss();
+                                    }
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }
                 break;
         }
     }
