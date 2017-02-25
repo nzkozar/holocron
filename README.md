@@ -1,4 +1,4 @@
-# Holocron
+# Holocron [![](https://jitpack.io/v/nzkozar/holocron.svg)](https://jitpack.io/#nzkozar/holocron)
 <h4>Encrypted Object Storage for Android</h4>
 <blockquote>Holocrons are ancient repositories of knowledge and wisdom that can only be accessed by those skilled in the Force.</blockquote>
 
