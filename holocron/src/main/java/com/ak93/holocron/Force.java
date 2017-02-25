@@ -25,10 +25,8 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Created by Anže Kožar on 22.2.2017.
  * The Force is required to unlock the Holocrons and access the data inside them
  */
-
 public class Force {
     private final String HOLOCRON_SHARED_PREF_NAME = "JediKnight"; //TODO replace with some random string
     private final String HOLOCRON_AES_PASS_PREF_KEY = "happk";

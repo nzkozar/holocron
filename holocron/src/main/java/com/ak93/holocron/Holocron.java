@@ -17,13 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Anže Kožar on 17.2.2017.
  * Holocron - Encrypted Object Storage for Android
  * "Holocrons are ancient repositories of knowledge and wisdom
  * that can only be accessed by those skilled in the Force."
  * TODO Mass object saving
  */
-
 public class Holocron {
 
     private static final int HOLOCRON_RESPONSE_INITIALIZED = 500;

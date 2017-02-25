@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import java.util.List;
 
 /**
- * Created by Anže Kožar on 25.2.2017.
  * An object to hold response data for use with HolocronResponseHandler
  */
 

@@ -8,9 +8,7 @@ import java.util.HashMap;
 
 /**
  * This class contains all configuration info needed for Holocron to operate
- * Created by Anže Kožar on 18.2.2017.
  */
-
 public class Configuration {
 
     private HashMap<String, String> classHashes;
