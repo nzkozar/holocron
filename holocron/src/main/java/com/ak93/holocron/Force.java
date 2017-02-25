@@ -159,6 +159,11 @@ public class Force {
         return "";
     }
 
+    /**
+     * Creates a SHA256 hash based on the given String
+     * @param in A string to hash
+     * @return An SHA256 hashed string
+     */
     private String SHA256(String in){
         String hash = "";
         try {

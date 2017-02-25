@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.ak93.holocron.Holocron;
-import com.ak93.holocron.HolocronData;
+import com.ak93.holocron.HolocronResponse;
 
 import java.util.ArrayList;
 
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             progressBar.setVisibility(View.VISIBLE);
             holocron = new Holocron(this, new Holocron.HolocronResponseHandler() {
                 @Override
-                public void onHolocronResponse(int responseCode, HolocronData data) {
+                public void onHolocronResponse(int responseCode, HolocronResponse data) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(loadAsync){
                 holocron.getAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
                     @Override
-                    public void onHolocronResponse(int responseCode, HolocronData data) {
+                    public void onHolocronResponse(int responseCode, HolocronResponse data) {
                         checkpoints.addAll(data.getDataObjectList());
                         Log.i(TAG, "Objects retrieved: " + checkpoints.size());
                         runOnUiThread(new Runnable() {
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     if(loadAsync){
                                         holocron.removeAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
                                             @Override
-                                            public void onHolocronResponse(int responseCode, HolocronData data) {
+                                            public void onHolocronResponse(int responseCode, HolocronResponse data) {
                                                 runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {

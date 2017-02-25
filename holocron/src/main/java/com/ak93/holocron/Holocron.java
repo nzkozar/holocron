@@ -22,8 +22,6 @@ import java.util.List;
  * "Holocrons are ancient repositories of knowledge and wisdom
  * that can only be accessed by those skilled in the Force."
  * TODO Mass object saving
- * TODO asynchronous Force initialisation on bg thread
- * TODO asynchronous object retrieval
  */
 
 public class Holocron {
@@ -153,7 +151,7 @@ public class Holocron {
             public void run() {
                 List<Object> objectList = getAll(c);
                 callback.onHolocronResponse(HOLOCRON_RESPONSE_OBJECTS_RETRIEVED,
-                        new HolocronData(null,objectList,null));
+                        new HolocronResponse(null,objectList,null));
             }
         }).start();
     }
@@ -228,14 +226,14 @@ public class Holocron {
         return true;
     }
 
-    public void removeAllAsync(final Class c, final HolocronResponseHandler callback){
+    public void removeAllAsync(final Class c, @Nullable final HolocronResponseHandler callback){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 removeAll(c);
                 if(callback!=null){
                     callback.onHolocronResponse(HOLOCRON_RESPONSE_OBJECTS_REMOVED
-                            ,new HolocronData(null,null,c));
+                            ,new HolocronResponse(null,null,c));
                 }
             }
         }).start();
@@ -347,6 +345,6 @@ public class Holocron {
     }
 
     public interface HolocronResponseHandler{
-        void onHolocronResponse(int responseCode, HolocronData data);
+        void onHolocronResponse(int responseCode, HolocronResponse data);
     }
 }
