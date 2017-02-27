@@ -29,7 +29,6 @@ public class Holocron {
     private static final int HOLOCRON_RESPONSE_OBJECTS_REMOVED = 502;
 
     private Context mContext;
-    private HolocronResponseHandler mCallback;
     private Configuration mConfiguration;
     private Gson mGson;
     private boolean initialized = false;
@@ -57,11 +56,10 @@ public class Holocron {
      * Asynchronous constructor. Use this constructor to avoid having your main thread execution delayed.
      * @param context Activity or application Context
      * @param callback A response callback handler, that will receive a callback when Holocron
-     *                 has been initialized.
+     *                 has been initialized. Null can be passed if no response is required.
      */
-    public Holocron(final Context context, HolocronResponseHandler callback){
+    public Holocron(final Context context, @Nullable final HolocronResponseHandler callback){
         mContext = context;
-        mCallback = callback;
         mGson = new Gson();
 
         new Thread(new Runnable() {
@@ -69,7 +67,7 @@ public class Holocron {
             public void run() {
                 mForce = new Force(context);
                 readConfiguration();
-                mCallback.onHolocronResponse(HOLOCRON_RESPONSE_INITIALIZED,null);
+                if(callback!=null) callback.onHolocronResponse(HOLOCRON_RESPONSE_INITIALIZED,null);
             }
         }).start();
     }
