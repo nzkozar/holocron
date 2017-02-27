@@ -16,6 +16,7 @@
 ```gradle
 	dependencies {
 	        compile 'com.github.nzkozar:holocron:v1.0@aar'
+		compile 'com.google.code.gson:gson:2.8.0'
 	}
 ```
 
