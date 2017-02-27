@@ -15,7 +15,7 @@
 <b>Step 2. Add the dependency
 ```gradle
 	dependencies {
-	        compile 'com.github.nzkozar:holocron:v1.0@aar'
+	        compile 'com.github.nzkozar:holocron:v1.0.1@aar'
 		compile 'com.google.code.gson:gson:2.8.0'
 	}
 ```
