@@ -329,18 +329,58 @@ public class Holocron {
         return ret;
     }
 
-    /**
-     * @return The Force object used for encryption/decryption
-     */
-    public Force getForce() {
-        return mForce;
-    }
-
     public boolean isInitialized(){
         return initialized;
     }
 
     public interface HolocronResponseHandler{
         void onHolocronResponse(int responseCode, HolocronResponse data);
+    }
+
+    /**
+     * @return The Force object used for encryption/decryption
+     */
+    private Force getForce() {
+        return mForce;
+    }
+
+    /**
+     * Encrypts a string using AES.
+     * @param string Unencrypted string
+     * @return An encrypted string.
+     */
+    public String encryptString(String string) throws IllegalStateException{
+        if(!initialized)throw new IllegalStateException("Holocron is not initialized!");
+        return mForce.encrypt(string);
+    }
+
+    /**
+     * Encrypts a byte array using AES.
+     * @param bytes Unencrypted byte array
+     * @return An encrypted byte array.
+     */
+    public byte[] encryptBytes(byte[] bytes) throws IllegalStateException{
+        if(!initialized)throw new IllegalStateException("Holocron is not initialized!");
+        return mForce.encrypt(bytes);
+    }
+
+    /**
+     * Decrypts a string using AES.
+     * @param string Encrypted string, previously encrypted using @encryptString
+     * @return A decrypted string.
+     */
+    public String decryptString(String string) throws IllegalStateException{
+        if(!initialized)throw new IllegalStateException("Holocron is not initialized!");
+        return mForce.decrypt(string);
+    }
+
+    /**
+     * Decrypts a byte array using AES.
+     * @param bytes Encrypted byte array, previously encrypted using @encryptBytes
+     * @return A decrypted byte array.
+     */
+    public byte[] decryptBytes(byte[] bytes) throws IllegalStateException{
+        if(!initialized)throw new IllegalStateException("Holocron is not initialized!");
+        return mForce.decrypt(bytes);
     }
 }

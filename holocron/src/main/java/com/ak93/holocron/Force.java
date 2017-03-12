@@ -123,38 +123,66 @@ public class Force {
      * @return Encrypted String
      */
     public String encrypt(String data){
+        byte[] bytes = new byte[0];
+        try {
+            bytes = encrypt(data.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return Base64.encodeToString(bytes,Base64.NO_WRAP);
+    }
+
+    /**
+     * Encrypts a byte array using AES
+     * @param data byte array to encrypt
+     * @return Encrypted byte array
+     */
+    public byte[] encrypt(byte[] data){
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, mAESkey, ivParams);
 
-            byte[] ciphertext = cipher.doFinal(data.getBytes("UTF-8"));
-            return Base64.encodeToString(ciphertext,Base64.NO_WRAP);
+            return cipher.doFinal(data);
         }catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException
-                | IllegalBlockSizeException | UnsupportedEncodingException e){
+                | IllegalBlockSizeException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Decrypts a AES encrypted string, that was previously encrypted using @encrypt method of this Class.
+     * @param data String to decrypt
+     * @return A decrypted string
+     */
+    public String decrypt(String data){
+        byte[] plaintext = decrypt(Base64.decode(data,Base64.NO_WRAP));
+        try {
+            return new String(plaintext,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return "";
     }
 
     /**
-     * Decrypts a AES encrypted string
-     * @param data String to decrypt
-     * @return A decrypted string
+     * Decrypts a AES encrypted byte array, that was previously encrypted using @encrypt method of this Class.
+     * @param data byte array to decrypt
+     * @return A decrypted byte array
      */
-    public String decrypt(String data){
+    public byte[] decrypt(byte[] data){
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, mAESkey, ivParams);
 
-            byte[] plaintext = cipher.doFinal(Base64.decode(data,Base64.NO_WRAP));
-            return new String(plaintext,"UTF-8");
+            return cipher.doFinal(data);
         }catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException
-                | IllegalBlockSizeException | UnsupportedEncodingException e){
+                | IllegalBlockSizeException e){
             e.printStackTrace();
         }
-        return "";
+        return null;
     }
 
     /**

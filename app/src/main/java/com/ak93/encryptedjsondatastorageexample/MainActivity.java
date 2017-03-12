@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Holocron holocron;
 
+    private RecyclerView recyclerView;
     private ProgressBar progressBar;
 
     private CheckpointListAdapter listAdapter;
@@ -67,9 +68,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button removeAllButton = (Button)findViewById(R.id.remove_all_button);
         removeAllButton.setOnClickListener(this);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.checkpoint_list);
+        recyclerView = (RecyclerView) findViewById(R.id.checkpoint_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this,
-                LinearLayoutManager.VERTICAL,false);
+                LinearLayoutManager.VERTICAL,true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
 
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void run() {
                                 listAdapter.notifyDataSetChanged();
+                                recyclerView.smoothScrollToPosition(checkpoints.size()-1);
                             }
                         });
                     }
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 checkpoints.addAll(holocron.getAll(Checkpoint.class));
                 Log.i(TAG, "Objects retrieved: " + checkpoints.size());
                 listAdapter.notifyDataSetChanged();
+                recyclerView.smoothScrollToPosition(checkpoints.size()-1);
             }
         }
     }
