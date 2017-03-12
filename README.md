@@ -12,10 +12,10 @@
 		}
 	}
 ```
-<b>Step 2. Add the dependency
+<b>Step 2. Add the dependency</b>
 ```gradle
 	dependencies {
-	        compile 'com.github.nzkozar:holocron:v1.0.1@aar'
+	        compile 'com.github.nzkozar:holocron:v1.0.2@aar'
 		compile 'com.google.code.gson:gson:2.8.0'
 	}
 ```
