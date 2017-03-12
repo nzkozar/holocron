@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.Date;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -28,7 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
  * The Force is required to unlock the Holocrons and access the data inside them
  */
 public class Force {
-    private final String HOLOCRON_SHARED_PREF_NAME = "JediKnight"; //TODO replace with some random string
+    private final String HOLOCRON_SHARED_PREF_NAME = "JediKnight";
     private final String HOLOCRON_AES_PASS_PREF_KEY = "happk";
     private final String HOLOCRON_AES_IV_STRING_PREF_KEY = "haispk";
     private final String HOLOCRON_AES_SALT_STRING_PREF_KEY = "hasspk";
@@ -55,8 +57,10 @@ public class Force {
         if(mPreferences.contains(HOLOCRON_AES_PASS_PREF_KEY)){
             passPhrase = mPreferences.getString(HOLOCRON_AES_PASS_PREF_KEY,null);
         }else{
-            passPhrase = SHA256(Settings.Secure.getString(mContext.getContentResolver(),
-                    Settings.Secure.ANDROID_ID)); //save curent device id as SHA256 hash
+            Date date = new Date();
+            String devID = Settings.Secure.getString(mContext.getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+            passPhrase = SHA256(devID+String.valueOf(date.getTime())); //save curent device id as SHA256 hash
             SharedPreferences.Editor editor = mPreferences.edit();
             editor.putString(HOLOCRON_AES_PASS_PREF_KEY,passPhrase);
             editor.apply();

@@ -95,7 +95,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void run() {
                                 listAdapter.notifyDataSetChanged();
-                                recyclerView.smoothScrollToPosition(checkpoints.size()-1);
+                                if(checkpoints.size()>0){
+                                    recyclerView.smoothScrollToPosition(checkpoints.size()-1);
+                                }
                             }
                         });
                     }
@@ -104,7 +106,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 checkpoints.addAll(holocron.getAll(Checkpoint.class));
                 Log.i(TAG, "Objects retrieved: " + checkpoints.size());
                 listAdapter.notifyDataSetChanged();
-                recyclerView.smoothScrollToPosition(checkpoints.size()-1);
+                if(checkpoints.size()>0){
+                    recyclerView.smoothScrollToPosition(checkpoints.size()-1);
+                }
             }
         }
     }
