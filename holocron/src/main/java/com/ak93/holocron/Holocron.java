@@ -106,7 +106,7 @@ public class Holocron {
 
         //sort object files by name
         //Bubble sort algorithm (sort by name)
-        Log.i(TAG,"Sort started");
+        //Log.i(TAG,"Sort started");
         boolean sorted = false;
         while (!sorted) {
             boolean switched = false;
@@ -124,7 +124,7 @@ public class Holocron {
                 sorted = true;
             }
         }
-        Log.i(TAG,"Sorted!");
+        //Log.i(TAG,"Sorted!");
 
         for(File f:objectFiles){
             if(f.isFile()) {
@@ -167,7 +167,7 @@ public class Holocron {
         File objectFile = new File(mContext.getFilesDir().getAbsolutePath()+
                 "/"+filename);
         if(!objectFile.exists()){
-            Log.e(TAG,"Object File doesn't exist!!!");
+            //Log.e(TAG,"Object File doesn't exist!!!");
             return null;
         }
 
@@ -286,7 +286,7 @@ public class Holocron {
             outputStreamWriter.write(encryptedData);
             outputStreamWriter.close();
             os.close();
-            Log.i(TAG,"Saved file with filename: "+filename+" & data: "+data);
+            //Log.i(TAG,"Saved file with filename: "+filename+" & data: "+data);
             return true;
         }catch (IOException e){
             e.printStackTrace();
@@ -300,7 +300,7 @@ public class Holocron {
      * @return
      */
     private String readObject(String filename) {
-        Log.i(TAG,"Reading file with filename: "+filename);
+        //Log.i(TAG,"Reading file with filename: "+filename);
         String ret = "";
         try {
             InputStream inputStream = mContext.openFileInput(filename);
