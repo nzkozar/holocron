@@ -15,7 +15,7 @@
 <b>Step 2. Add the dependency</b>
 ```gradle
 	dependencies {
-	        compile 'com.github.nzkozar:holocron:v1.0.2@aar'
+	        compile 'com.github.nzkozar:holocron:v1.0.4@aar'
 		compile 'com.google.code.gson:gson:2.8.0'
 	}
 ```
@@ -40,29 +40,29 @@ Holocron holocron = new Holocron(context, new Holocron.HolocronResponseHandler()
 holocron.put(object, (long)object.getId());
 
 //retrieve a single stored object of a class using an id. Returns null if no object matches both class and id
-Object object = holocron.get(object.getClass(),(long)id);
+Checkpoint checkpoint = holocron.get(Checkpoint.class,(long)id);
 
 //retrieve all objects stored using the provided Class
-List<Object> objects = holocron.getAll(object.getClass());
+List<Checkpoint> checkpoints = holocron.getAll(Checkpoint.class);
 
 //retrieve asynchronously all objects stored using the provided Class
-holocron.getAllAsync(object.class, new Holocron.HolocronResponseHandler() {
+holocron.getAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
             @Override
             public void onHolocronResponse(int responseCode, HolocronResponse response) {
-                List<Object> objects = data.getDataObjectList());
+                List<Checkpoint> checkpoints = data.getDataObjectList());
             }
         });
 ```
 ### Delete objects from storage
 ```java
 //delete an object from storage
-boolean deleted = holocron.remove(object.getClass(),(long)id);
+boolean deleted = holocron.remove(Checkpoint.class,(long)id);
 
 //delete all objects of a provided Class from storage
-boolean deleted = holocron.remove(object.getClass());
+boolean deleted = holocron.remove(Checkpoint.class);
 
 //delete asynchronously all objects of a provided Class from storage
-holocron.removeAllAsync(object.class, new Holocron.HolocronResponseHandler() {
+holocron.removeAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
         @Override
         public void onHolocronResponse(int responseCode, HolocronResponse response) {
             //Objects deleted
