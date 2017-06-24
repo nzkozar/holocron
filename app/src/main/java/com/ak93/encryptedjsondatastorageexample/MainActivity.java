@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ProgressBar progressBar;
 
     private CheckpointListAdapter listAdapter;
-    private ArrayList<Object> checkpoints = new ArrayList<>();
+    private ArrayList<Checkpoint> checkpoints = new ArrayList<>();
 
     private boolean loadAsync = true;
 

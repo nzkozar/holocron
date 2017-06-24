@@ -20,7 +20,7 @@ public class CheckpointListAdapter extends RecyclerView.Adapter<CheckpointListAd
     private OnListItemChildClickListener onItemChildClickListener;
 
     //Dataset
-    private ArrayList<Object> mDataset = new ArrayList<>();
+    private ArrayList<Checkpoint> mDataset = new ArrayList<>();
     //This tag is used to identify the adapter in interface callbacks
     // where multiple adapters are reporting to a single callback method
     String adapterTAG;
@@ -52,7 +52,7 @@ public class CheckpointListAdapter extends RecyclerView.Adapter<CheckpointListAd
      * @param checkpoints Checkpoints to populate the list with
      * @param tag String TAG to identify the adapter in interface callbacks
      */
-    public CheckpointListAdapter(ArrayList<Object> checkpoints, String tag) {
+    public CheckpointListAdapter(ArrayList<Checkpoint> checkpoints, String tag) {
         mDataset = checkpoints;
         adapterTAG = tag;
     }
@@ -67,7 +67,7 @@ public class CheckpointListAdapter extends RecyclerView.Adapter<CheckpointListAd
     @Override
     public void onBindViewHolder(final CheckpointListAdapter.ViewHolder holder, final int position) {
 
-        Checkpoint checkpoint = (Checkpoint) mDataset.get(position);
+        Checkpoint checkpoint = mDataset.get(position);
 
         holder.id_text.setText(String.valueOf(checkpoint.getId()));
         holder.name_text.setText(String.valueOf(checkpoint.getName()));

@@ -4,7 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/EncryptedJSONDataStorageExample.iml" filepath="$PROJECT_DIR$/EncryptedJSONDataStorageExample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/holocron.iml" filepath="$PROJECT_DIR$/holocron.iml" />
       <module fileurl="file://$PROJECT_DIR$/holocron/holocron.iml" filepath="$PROJECT_DIR$/holocron/holocron.iml" />
+      <module fileurl="file://$PROJECT_DIR$/holocron/holocron-holocron.iml" filepath="$PROJECT_DIR$/holocron/holocron-holocron.iml" />
     </modules>
   </component>
 </project>

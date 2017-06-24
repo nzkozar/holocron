@@ -20,13 +20,12 @@ import java.util.List;
  * Holocron - Encrypted Object Storage for Android
  * "Holocrons are ancient repositories of knowledge and wisdom
  * that can only be accessed by those skilled in the Force."
- * TODO Mass object saving
  */
 public class Holocron {
 
-    private static final int HOLOCRON_RESPONSE_INITIALIZED = 500;
-    private static final int HOLOCRON_RESPONSE_OBJECTS_RETRIEVED = 501;
-    private static final int HOLOCRON_RESPONSE_OBJECTS_REMOVED = 502;
+    public static final int HOLOCRON_RESPONSE_INITIALIZED = 500;
+    public static final int HOLOCRON_RESPONSE_OBJECTS_RETRIEVED = 501;
+    public static final int HOLOCRON_RESPONSE_OBJECTS_REMOVED = 502;
 
     private Context mContext;
     private Configuration mConfiguration;
@@ -92,8 +91,8 @@ public class Holocron {
      * @param c The class of the objects to retrieve
      * @return An ArrayList of all objects stored using the provided class
      */
-    public List<Object> getAll(Class c){
-        List<Object> objects = new ArrayList<>();
+    public <T>List<T> getAll(Class<T> c){
+        List<T> objects = new ArrayList<>();
         final String classHash = mConfiguration.getClassHash(c);
         if(classHash==null)return objects;
         File filesDir = mContext.getFilesDir();
@@ -103,10 +102,14 @@ public class Holocron {
                 return name.contains(classHash);
             }
         });
+        for (File objectFile : objectFiles) {
+            Log.i(TAG, objectFile.getName());
+        }
 
-        //sort object files by name
+        //sort object files by name //probably unneeded if files are retrieved by name
         //Bubble sort algorithm (sort by name)
         //Log.i(TAG,"Sort started");
+        /*
         boolean sorted = false;
         while (!sorted) {
             boolean switched = false;
@@ -125,7 +128,7 @@ public class Holocron {
             }
         }
         //Log.i(TAG,"Sorted!");
-
+        */
         for(File f:objectFiles){
             if(f.isFile()) {
                 String objectJson = readObject(f.getName());
@@ -141,13 +144,12 @@ public class Holocron {
      * @param c The class of the objects to retrieve
      * @param callback A callback through which the data is returned.
      */
-    public void getAllAsync(final Class c, final HolocronResponseHandler callback){
+    public <T> void getAllAsync(final Class<T> c, final HolocronResponseHandler callback){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<Object> objectList = getAll(c);
                 callback.onHolocronResponse(HOLOCRON_RESPONSE_OBJECTS_RETRIEVED,
-                        new HolocronResponse(null,objectList,null));
+                        new HolocronResponse<T>(null,getAll(c)));
             }
         }).start();
     }
@@ -158,10 +160,10 @@ public class Holocron {
      * @param id Id of the object to retrieve
      * @return An object of Class c and saved with id or null if no such object is stored.
      */
-    public Object get(final Class c,final long id){
+    public <T>T get(final Class<T> c,final long id){
         String filename = getObjectFileName(c,id);
         if(filename==null){
-            Log.e(TAG,"No class hash in configuration!!!");
+            //Log.e(TAG,"No class hash in configuration!!!");
             return null;
         }
         File objectFile = new File(mContext.getFilesDir().getAbsolutePath()+
@@ -180,20 +182,15 @@ public class Holocron {
      * @param id Id of the stored object
      * @return Returns true if the object has been successfully removed
      */
-    public boolean remove(final Class c,final long id){
-        String filename = getObjectFileName(c,id);
-        if(filename==null){
-            //Log.e(TAG,"No class hash in configuration!!!");
+    public boolean remove(final Class c,final long id) {
+        String filename = getObjectFileName(c, id);
+        if (filename == null) {
             return false;
         }
-        File objectFile = new File(mContext.getFilesDir().getAbsolutePath()+
-                "/"+filename);
-        if(!objectFile.exists()){
-            //Log.e(TAG,"Object File doesn't exist!!!");
-            return false;
-        }
+        File objectFile = new File(mContext.getFilesDir().getAbsolutePath() +
+                "/" + filename);
+        return objectFile.exists() && objectFile.delete();
 
-        return objectFile.delete();
     }
 
     /**
@@ -229,7 +226,7 @@ public class Holocron {
                 removeAll(c);
                 if(callback!=null){
                     callback.onHolocronResponse(HOLOCRON_RESPONSE_OBJECTS_REMOVED
-                            ,new HolocronResponse(null,null,c));
+                            ,new HolocronResponse<>(null,null,c));
                 }
             }
         }).start();
@@ -316,15 +313,15 @@ public class Holocron {
                 inputStream.close();
                 ret = stringBuilder.toString();
             }
+
+            //Decrypt data to a JSON string
+            ret = mForce.decrypt(ret);
         }
         catch (FileNotFoundException e) {
-            Log.e(TAG, "File not found: " + e.toString());
+            //Log.e(TAG, "File not found: " + e.toString());
         } catch (IOException e) {
-            Log.e(TAG, "Can not read file: " + e.toString());
+            //Log.e(TAG, "Can not read file: " + e.toString());
         }
-
-        //Decrypt data to a JSON string
-        ret = mForce.decrypt(ret);
 
         return ret;
     }
@@ -334,7 +331,7 @@ public class Holocron {
     }
 
     public interface HolocronResponseHandler{
-        void onHolocronResponse(int responseCode, HolocronResponse data);
+        <T> void onHolocronResponse(int responseCode, HolocronResponse<T> data);
     }
 
     /**
