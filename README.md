@@ -15,7 +15,7 @@
 <b>Step 2. Add the dependency</b>
 ```gradle
 	dependencies {
-	        compile 'com.github.nzkozar:holocron:v1.0.4@aar'
+	        compile 'com.github.nzkozar:holocron:v1.0.5@aar'
 		compile 'com.google.code.gson:gson:2.8.0'
 	}
 ```
@@ -25,11 +25,13 @@
 ```java
 //Init Holocron. This will take  few seconds to execute, as it must build encryption resources.
 Holocron holocron = new Holocron(context);
-
-//Init Holocron asynchronously and get notified through a HolocronResponseHandler interface when Holocron is ready.
-Holocron holocron = new Holocron(context, new Holocron.HolocronResponseHandler() {
+```
+or
+```
+//Init Holocron asynchronously and get notified through a HolocronInitListener interface when Holocron is ready.
+Holocron holocron = new Holocron(context, new HolocronInitListener() {
                 @Override
-                public void onHolocronResponse(int responseCode, HolocronResponse response) {
+                public void onHolocronInitComplete() {
                     //Holocron can now be used
                 }
             });
@@ -46,9 +48,9 @@ Checkpoint checkpoint = holocron.get(Checkpoint.class,(long)id);
 List<Checkpoint> checkpoints = holocron.getAll(Checkpoint.class);
 
 //retrieve asynchronously all objects stored using the provided Class
-holocron.getAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
+holocron.getAllAsync(Checkpoint.class, new HolocronResponseHandler<Checkpoint>() {
             @Override
-            public void onHolocronResponse(int responseCode, HolocronResponse response) {
+            public void onHolocronResponse(int responseCode, HolocronResponse<Checkpoint> response) {
                 List<Checkpoint> checkpoints = data.getDataObjectList());
             }
         });
@@ -62,7 +64,7 @@ boolean deleted = holocron.remove(Checkpoint.class,(long)id);
 boolean deleted = holocron.remove(Checkpoint.class);
 
 //delete asynchronously all objects of a provided Class from storage
-holocron.removeAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
+holocron.removeAllAsync(Checkpoint.class, new HolocronResponseHandler() {
         @Override
         public void onHolocronResponse(int responseCode, HolocronResponse response) {
             //Objects deleted
