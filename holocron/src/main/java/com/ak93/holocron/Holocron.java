@@ -57,7 +57,7 @@ public class Holocron {
      * @param callback A response callback handler, that will receive a callback when Holocron
      *                 has been initialized. Null can be passed if no response is required.
      */
-    public Holocron(final Context context, @Nullable final HolocronResponseHandler callback){
+    public Holocron(final Context context, @Nullable final HolocronInitListener callback){
         mContext = context;
         mGson = new Gson();
 
@@ -66,7 +66,7 @@ public class Holocron {
             public void run() {
                 mForce = new Force(context);
                 readConfiguration();
-                if(callback!=null) callback.onHolocronResponse(HOLOCRON_RESPONSE_INITIALIZED,null);
+                if(callback!=null) callback.onHolocronInitComplete();
             }
         }).start();
     }
@@ -102,14 +102,11 @@ public class Holocron {
                 return name.contains(classHash);
             }
         });
-        for (File objectFile : objectFiles) {
-            Log.i(TAG, objectFile.getName());
-        }
 
-        //sort object files by name //probably unneeded if files are retrieved by name
-        //Bubble sort algorithm (sort by name)
+        //sort object files by name
+        //Bubble sort algorithm (sort by name) //TODO upgrade to a faster sort algorithm
         //Log.i(TAG,"Sort started");
-        /*
+
         boolean sorted = false;
         while (!sorted) {
             boolean switched = false;
@@ -128,7 +125,7 @@ public class Holocron {
             }
         }
         //Log.i(TAG,"Sorted!");
-        */
+
         for(File f:objectFiles){
             if(f.isFile()) {
                 String objectJson = readObject(f.getName());
@@ -144,7 +141,7 @@ public class Holocron {
      * @param c The class of the objects to retrieve
      * @param callback A callback through which the data is returned.
      */
-    public <T> void getAllAsync(final Class<T> c, final HolocronResponseHandler callback){
+    public <T> void getAllAsync(final Class<T> c, final HolocronResponseHandler<T> callback){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -328,10 +325,6 @@ public class Holocron {
 
     public boolean isInitialized(){
         return initialized;
-    }
-
-    public interface HolocronResponseHandler{
-        <T> void onHolocronResponse(int responseCode, HolocronResponse<T> data);
     }
 
     /**

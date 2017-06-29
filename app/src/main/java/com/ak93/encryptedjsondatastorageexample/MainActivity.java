@@ -13,7 +13,9 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.ak93.holocron.Holocron;
+import com.ak93.holocron.HolocronInitListener;
 import com.ak93.holocron.HolocronResponse;
+import com.ak93.holocron.HolocronResponseHandler;
 
 import java.util.ArrayList;
 
@@ -41,9 +43,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(loadAsync){
             progressBar.setIndeterminate(true);
             progressBar.setVisibility(View.VISIBLE);
-            holocron = new Holocron(this, new Holocron.HolocronResponseHandler() {
+            holocron = new Holocron(this, new HolocronInitListener() {
                 @Override
-                public void onHolocronResponse(int responseCode, HolocronResponse data) {
+                public void onHolocronInitComplete() {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -86,9 +88,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(holocron.isInitialized()) {
             checkpoints.clear();
             if(loadAsync){
-                holocron.getAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
+                holocron.getAllAsync(Checkpoint.class, new HolocronResponseHandler<Checkpoint>() {
                     @Override
-                    public void onHolocronResponse(int responseCode, HolocronResponse data) {
+                    public void onHolocronResponse(int responseCode, HolocronResponse<Checkpoint> data) {
                         checkpoints.addAll(data.getDataObjectList());
                         Log.i(TAG, "Objects retrieved: " + checkpoints.size());
                         runOnUiThread(new Runnable() {
@@ -146,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public void onClick(final DialogInterface dialog, int which) {
                                     if(loadAsync){
-                                        holocron.removeAllAsync(Checkpoint.class, new Holocron.HolocronResponseHandler() {
+                                        holocron.removeAllAsync(Checkpoint.class, new HolocronResponseHandler() {
                                             @Override
                                             public void onHolocronResponse(int responseCode, HolocronResponse data) {
                                                 runOnUiThread(new Runnable() {
