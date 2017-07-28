@@ -91,8 +91,9 @@ public class Holocron {
      * @param c The class of the objects to retrieve
      * @return An ArrayList of all objects stored using the provided class
      */
-    public <T>List<T> getAll(Class<T> c){
+    public <T>List<T> getAll(Class<T> c) throws OutOfMemoryError{
         List<T> objects = new ArrayList<>();
+        if(mConfiguration==null)readConfiguration(); //Ensure we have configuration file
         final String classHash = mConfiguration.getClassHash(c);
         if(classHash==null)return objects;
         File filesDir = mContext.getFilesDir();
@@ -126,10 +127,11 @@ public class Holocron {
         }
         //Log.i(TAG,"Sorted!");
 
-        for(File f:objectFiles){
-            if(f.isFile()) {
+        for (File f : objectFiles) {
+            if (f.isFile()) {
                 String objectJson = readObject(f.getName());
-                objects.add(mGson.fromJson(objectJson, c));
+                if (objectJson != null)
+                    objects.add(mGson.fromJson(objectJson, c));
             }
         }
         return objects;
@@ -231,6 +233,7 @@ public class Holocron {
 
     @Nullable
     private String getObjectFileName(Class c, long id){
+        if(mConfiguration==null)readConfiguration();
         String classHash = mConfiguration.getClassHash(c);
         if(classHash == null)return null;
         return classHash + "_" + String.valueOf(id);
@@ -251,6 +254,7 @@ public class Holocron {
         String json;
         if(file.exists()) {
             json = readObject("cfg.j");
+            if(json==null)throw new OutOfMemoryError();
             mConfiguration = mGson.fromJson(json, Configuration.class);
         }else{
             mConfiguration = new Configuration();
@@ -272,7 +276,12 @@ public class Holocron {
      */
     private boolean writeObject(String filename,String data){
         //Encrypt data with AES before writing it
-        String encryptedData = mForce.encrypt(data);
+        String encryptedData;
+        try {
+            encryptedData = mForce.encrypt(data);
+        }catch (OutOfMemoryError e){
+            return false;
+        }
         FileOutputStream os;
         try{
             os = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
@@ -293,9 +302,9 @@ public class Holocron {
      * @param filename
      * @return
      */
-    private String readObject(String filename) {
+    private String readObject(String filename) throws OutOfMemoryError{
         //Log.i(TAG,"Reading file with filename: "+filename);
-        String ret = "";
+        String ret = null;
         try {
             InputStream inputStream = mContext.openFileInput(filename);
             if (inputStream != null) {
@@ -339,7 +348,7 @@ public class Holocron {
      * @param string Unencrypted string
      * @return An encrypted string.
      */
-    public String encryptString(String string) throws IllegalStateException{
+    public String encryptString(String string) throws IllegalStateException, OutOfMemoryError{
         if(!initialized)throw new IllegalStateException("Holocron is not initialized!");
         return mForce.encrypt(string);
     }
@@ -349,7 +358,7 @@ public class Holocron {
      * @param bytes Unencrypted byte array
      * @return An encrypted byte array.
      */
-    public byte[] encryptBytes(byte[] bytes) throws IllegalStateException{
+    public byte[] encryptBytes(byte[] bytes) throws IllegalStateException, OutOfMemoryError{
         if(!initialized)throw new IllegalStateException("Holocron is not initialized!");
         return mForce.encrypt(bytes);
     }
@@ -359,7 +368,7 @@ public class Holocron {
      * @param string Encrypted string, previously encrypted using @encryptString
      * @return A decrypted string.
      */
-    public String decryptString(String string) throws IllegalStateException{
+    public String decryptString(String string) throws IllegalStateException, OutOfMemoryError{
         if(!initialized)throw new IllegalStateException("Holocron is not initialized!");
         return mForce.decrypt(string);
     }
@@ -369,7 +378,7 @@ public class Holocron {
      * @param bytes Encrypted byte array, previously encrypted using @encryptBytes
      * @return A decrypted byte array.
      */
-    public byte[] decryptBytes(byte[] bytes) throws IllegalStateException{
+    public byte[] decryptBytes(byte[] bytes) throws IllegalStateException, OutOfMemoryError{
         if(!initialized)throw new IllegalStateException("Holocron is not initialized!");
         return mForce.decrypt(bytes);
     }

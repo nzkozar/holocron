@@ -126,7 +126,7 @@ public class Force {
      * @param data String to encrypt
      * @return Encrypted String
      */
-    public String encrypt(String data){
+    public String encrypt(String data) throws OutOfMemoryError{
         byte[] bytes = new byte[0];
         try {
             bytes = encrypt(data.getBytes("UTF-8"));
@@ -141,11 +141,10 @@ public class Force {
      * @param data byte array to encrypt
      * @return Encrypted byte array
      */
-    public byte[] encrypt(byte[] data){
+    public byte[] encrypt(byte[] data) throws OutOfMemoryError{
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, mAESkey, ivParams);
-
             return cipher.doFinal(data);
         }catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException
@@ -160,7 +159,7 @@ public class Force {
      * @param data String to decrypt
      * @return A decrypted string
      */
-    public String decrypt(String data){
+    public String decrypt(String data) throws OutOfMemoryError{
         byte[] plaintext = decrypt(Base64.decode(data,Base64.NO_WRAP));
         try {
             return new String(plaintext,"UTF-8");
@@ -175,7 +174,7 @@ public class Force {
      * @param data byte array to decrypt
      * @return A decrypted byte array
      */
-    public byte[] decrypt(byte[] data){
+    public byte[] decrypt(byte[] data) throws OutOfMemoryError{
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, mAESkey, ivParams);
