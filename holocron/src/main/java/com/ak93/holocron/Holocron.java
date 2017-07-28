@@ -76,6 +76,7 @@ public class Holocron {
      * @param o The object to be saved
      */
     public boolean put(Object o,long id){
+        if(mConfiguration==null)readConfiguration(); //Ensure we have configuration file
         String classHash = mConfiguration.getClassHash(o.getClass());
         if(classHash==null){
             classHash = mConfiguration.addClassHash(o.getClass());
@@ -198,6 +199,7 @@ public class Holocron {
      * @return true if all objects of c were removed
      */
     public boolean removeAll(Class c){
+        if(mConfiguration==null)readConfiguration(); //Ensure we have configuration file
         final String classHash = mConfiguration.getClassHash(c);
         if(classHash==null)return true;
         File filesDir = mContext.getFilesDir();
