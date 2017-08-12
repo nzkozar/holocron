@@ -117,7 +117,6 @@ public class Force {
                 e.printStackTrace();
             }
         }
-
         Log.i(TAG,"Force init complete.");
     }
 
@@ -160,11 +159,14 @@ public class Force {
      * @return A decrypted string
      */
     public String decrypt(String data) throws OutOfMemoryError{
-        byte[] plaintext = decrypt(Base64.decode(data,Base64.NO_WRAP));
         try {
+            byte[] plaintext = decrypt(Base64.decode(data,Base64.NO_WRAP));
             return new String(plaintext,"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+        } catch (IllegalArgumentException e1){
+            Log.e(TAG,"decrypt string: "+data);
+            e1.printStackTrace();
         }
         return "";
     }

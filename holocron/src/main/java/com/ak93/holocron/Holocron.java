@@ -31,9 +31,10 @@ public class Holocron {
     private Configuration mConfiguration;
     private Gson mGson;
     private boolean initialized = false;
+    private boolean debug = false;
 
     //Encryption fields
-    private Force mForce;
+    private volatile Force mForce;
 
     private final String TAG = "Holocron";
 
@@ -69,6 +70,14 @@ public class Holocron {
                 if(callback!=null) callback.onHolocronInitComplete();
             }
         }).start();
+    }
+
+    /**
+     * Enables debug logging
+     * @param debug
+     */
+    public void enableDebug(boolean debug){
+        this.debug = debug;
     }
 
     /**
@@ -172,6 +181,7 @@ public class Holocron {
             //Log.e(TAG,"Object File doesn't exist!!!");
             return null;
         }
+
 
         return mGson.fromJson(readObject(filename),c);
     }
@@ -280,7 +290,12 @@ public class Holocron {
         //Encrypt data with AES before writing it
         String encryptedData;
         try {
-            encryptedData = mForce.encrypt(data);
+            if(mForce!=null){
+                encryptedData = mForce.encrypt(data);
+            }else{
+                if(debug)Log.e(TAG,"writeObject mForce == null");
+                return false;
+            }
         }catch (OutOfMemoryError e){
             return false;
         }
@@ -319,13 +334,16 @@ public class Holocron {
                 }
 
                 inputStream.close();
-                ret = stringBuilder.toString();
-            }
+                if(mForce!=null) {
+                    ret = stringBuilder.toString();
 
-            //Decrypt data to a JSON string
-            ret = mForce.decrypt(ret);
-        }
-        catch (FileNotFoundException e) {
+                    //Decrypt data to a JSON string
+                    ret = mForce.decrypt(ret);
+                }else {
+                    if(debug)Log.e(TAG,"readObject mForce == null");
+                }
+            }
+        } catch (FileNotFoundException e) {
             //Log.e(TAG, "File not found: " + e.toString());
         } catch (IOException e) {
             //Log.e(TAG, "Can not read file: " + e.toString());
