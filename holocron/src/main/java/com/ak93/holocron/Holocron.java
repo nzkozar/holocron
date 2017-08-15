@@ -123,8 +123,21 @@ public class Holocron {
             boolean switched = false;
             for (int i = 0; i < (objectFiles.length - 1); i++) {
                 File a = objectFiles[i];
-                File b = objectFiles[i + 1];
-                if (b.getName().compareTo(a.getName()) < 1) {
+                File b = objectFiles[i+1];
+
+                //String idA = a.getName().split("_")[1];
+                Long idAlong = Long.parseLong(a.getName().split("_")[1]);
+                //String idB = a.getName().split("_")[1];
+                Long idBlong = Long.parseLong(a.getName().split("_")[1]);
+
+                /*if (idB.compareTo(idA) < 1) {
+                    objectFiles[i] = b;
+                    objectFiles[i+1] = a;
+                    //Log.i("BUBLESORT", "@" + i + " SWITCHED: " + aID + " & " + bID);
+                    switched = true;
+                }*/
+
+                if(idBlong<idAlong){
                     objectFiles[i] = b;
                     objectFiles[i+1] = a;
                     //Log.i("BUBLESORT", "@" + i + " SWITCHED: " + aID + " & " + bID);

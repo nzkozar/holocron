@@ -90,7 +90,7 @@ public class Configuration {
         }catch (NoSuchAlgorithmException e){
             e.printStackTrace();
         }
-        Log.i("JediConfiguration","Class "+c.getName()+" hash: "+hash);
+        //Log.i("JediConfiguration","Class "+c.getName()+" hash: "+hash);
         return hash;
     }
 }
