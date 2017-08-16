@@ -131,7 +131,7 @@ public class Holocron {
                 if(idBlong<idAlong){
                     objectFiles[i] = b;
                     objectFiles[i+1] = a;
-                    Log.i(TAG, "BUBLESORT@" + i + " SWITCHED: " + idAlong + " & " + idBlong);
+                    if(debug)Log.i(TAG, "BUBLESORT@" + i + " SWITCHED: " + idAlong + " & " + idBlong);
                     switched = true;
                 }
             }
