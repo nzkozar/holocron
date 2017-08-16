@@ -1,6 +1,5 @@
 package com.ak93.holocron;
 
-import android.util.Log;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

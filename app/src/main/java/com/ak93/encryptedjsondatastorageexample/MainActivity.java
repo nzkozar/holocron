@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             holocron = new Holocron(this, new HolocronInitListener() {
                 @Override
                 public void onHolocronInitComplete() {
+                    holocron.enableDebug(true);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -93,6 +94,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onHolocronResponse(int responseCode, HolocronResponse<Checkpoint> data) {
                         checkpoints.addAll(data.getDataObjectList());
                         Log.i(TAG, "Objects retrieved: " + checkpoints.size());
+                        for(Checkpoint c:checkpoints){
+                            Log.i(TAG,c.getId()+": "+c.getName());
+                        }
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
