@@ -49,7 +49,12 @@ public class Holocron {
         mGson = new Gson();
 
         mForce = new Force(mContext);
-        readConfiguration();
+
+        try{
+            readConfiguration(); //Ensure we have configuration file
+        }catch (OutOfMemoryError error){
+            if(debug) error.printStackTrace();
+        }
     }
 
     /**
@@ -66,8 +71,12 @@ public class Holocron {
             @Override
             public void run() {
                 mForce = new Force(context);
-                readConfiguration();
-                if(callback!=null) callback.onHolocronInitComplete();
+                try{
+                    readConfiguration(); //Ensure we have configuration file
+                    if(callback!=null) callback.onHolocronInitComplete();
+                }catch (OutOfMemoryError error){
+                    if(debug) error.printStackTrace();
+                }
             }
         }).start();
     }
@@ -85,7 +94,13 @@ public class Holocron {
      * @param o The object to be saved
      */
     public boolean put(Object o,long id){
-        if(mConfiguration==null)readConfiguration(); //Ensure we have configuration file
+        if(mConfiguration==null){
+            try{
+                readConfiguration(); //Ensure we have configuration file
+            }catch (OutOfMemoryError error){
+                return false;
+            }
+        }
         String classHash = mConfiguration.getClassHash(o.getClass());
         if(classHash==null){
             classHash = mConfiguration.addClassHash(o.getClass());
@@ -103,52 +118,62 @@ public class Holocron {
      */
     public <T>List<T> getAll(Class<T> c) throws OutOfMemoryError{
         List<T> objects = new ArrayList<>();
-        if(mConfiguration==null)readConfiguration(); //Ensure we have configuration file
-        final String classHash = mConfiguration.getClassHash(c);
-        if(classHash==null)return objects;
-        File filesDir = mContext.getFilesDir();
-        File[] objectFiles = filesDir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.contains(classHash);
+        if(mConfiguration==null){
+            try{
+                readConfiguration(); //Ensure we have configuration file
+            }catch (OutOfMemoryError error){
+                return objects;
             }
-        });
+        }
+        final String classHash = mConfiguration.getClassHash(c);
+        if(classHash==null){
+            return objects;
+        }else {
+            File filesDir = mContext.getFilesDir();
+            File[] objectFiles = filesDir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.contains(classHash);
+                }
+            });
 
-        //sort object files by name
-        //Bubble sort algorithm (sort by name) //TODO upgrade to a faster sort algorithm
-        //Log.i(TAG,"Sort started");
+            //sort object files by name
+            //Bubble sort algorithm (sort by name) //TODO upgrade to a faster sort algorithm
+            //Log.i(TAG,"Sort started");
 
-        boolean sorted = false;
-        while (!sorted) {
-            boolean switched = false;
-            for (int i = 0; i < (objectFiles.length - 1); i++) {
-                File a = objectFiles[i];
-                File b = objectFiles[i+1];
+            boolean sorted = false;
+            while (!sorted) {
+                boolean switched = false;
+                for (int i = 0; i < (objectFiles.length - 1); i++) {
+                    File a = objectFiles[i];
+                    File b = objectFiles[i + 1];
 
-                Long idAlong = Long.parseLong(a.getName().split("_")[1]);
-                Long idBlong = Long.parseLong(b.getName().split("_")[1]);
+                    Long idAlong = Long.parseLong(a.getName().split("_")[1]);
+                    Long idBlong = Long.parseLong(b.getName().split("_")[1]);
 
-                if(idBlong<idAlong){
-                    objectFiles[i] = b;
-                    objectFiles[i+1] = a;
-                    if(debug)Log.i(TAG, "BUBLESORT@" + i + " SWITCHED: " + idAlong + " & " + idBlong);
-                    switched = true;
+                    if (idBlong < idAlong) {
+                        objectFiles[i] = b;
+                        objectFiles[i + 1] = a;
+                        if (debug)
+                            Log.i(TAG, "BUBLESORT@" + i + " SWITCHED: " + idAlong + " & " + idBlong);
+                        switched = true;
+                    }
+                }
+                if (!switched) {
+                    sorted = true;
                 }
             }
-            if (!switched) {
-                sorted = true;
-            }
-        }
-        //Log.i(TAG,"Sorted!");
+            //Log.i(TAG,"Sorted!");
 
-        for (File f : objectFiles) {
-            if (f.isFile()) {
-                String objectJson = readObject(f.getName());
-                if (objectJson != null)
-                    objects.add(mGson.fromJson(objectJson, c));
+            for (File f : objectFiles) {
+                if (f.isFile()) {
+                    String objectJson = readObject(f.getName());
+                    if (objectJson != null)
+                        objects.add(mGson.fromJson(objectJson, c));
+                }
             }
+            return objects;
         }
-        return objects;
     }
 
     /**
@@ -213,7 +238,13 @@ public class Holocron {
      * @return true if all objects of c were removed
      */
     public boolean removeAll(Class c){
-        if(mConfiguration==null)readConfiguration(); //Ensure we have configuration file
+        if(mConfiguration==null){
+            try {
+                readConfiguration(); //Ensure we have configuration file
+            }catch (OutOfMemoryError error){
+                return false;
+            }
+        }
         final String classHash = mConfiguration.getClassHash(c);
         if(classHash==null)return true;
         File filesDir = mContext.getFilesDir();
@@ -249,7 +280,13 @@ public class Holocron {
 
     @Nullable
     private String getObjectFileName(Class c, long id){
-        if(mConfiguration==null)readConfiguration();
+        if(mConfiguration==null){
+            try{
+                readConfiguration(); //Ensure we have configuration file
+            }catch (OutOfMemoryError error){
+                return null;
+            }
+        }
         String classHash = mConfiguration.getClassHash(c);
         if(classHash == null)return null;
         return classHash + "_" + String.valueOf(id);
@@ -265,7 +302,7 @@ public class Holocron {
     /**
      * Retrieves a saved Holocron configuration object
      */
-    private void readConfiguration(){
+    private void readConfiguration() throws OutOfMemoryError{
         File file = new File(mContext.getFilesDir().getAbsolutePath()+"/"+"cfg.j");
         String json;
         if(file.exists()) {
